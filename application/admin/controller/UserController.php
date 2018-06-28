@@ -10,11 +10,10 @@ namespace app\admin\controller;
 
 
 use app\admin\Admin;
-use app\common\Result;
 use app\common\service\UserService;
+use app\common\utils\EasyResult;
+use app\common\utils\EasyValidate;
 use think\facade\Hook;
-use think\facade\Validate;
-use think\validate\ValidateRule;
 
 class UserController extends Admin
 {
@@ -30,21 +29,31 @@ class UserController extends Admin
 
     /**
      * 用户登录接口
-     * @param $username
-     * @param $password
-     * @param $captcha
+     * @param string $username 登录账号
+     * @param string $password 登录密码
+     * @param string $captcha
+     * @return EasyResult
      */
     public function login($username, $password, $captcha)
     {
-        $result = Validate::make() ->rule('username',ValidateRule::must()->isEmail()->title('邮箱')) ->check($this ->request ->param());
-        halt($result);
+        //字段验证
+        $rules = ['username' =>'require', 'password' =>'require|min:6'];
+        $message = ['username.require' =>'登录账号不能为空', 'password.require' =>'密码不能为空', 'password.min' =>'登录密码最少6位数'];
+        EasyValidate::make($this ->request ->param(), $rules, $message)->send();
 
+        //验证码验证
+        if(!captcha_check($captcha)) {
+//            return EasyResult::error('验证码错误');
+        }
+
+        //执行登录操作
+        $token = $this ->userService ->usernameLogin($username, $password);
         Hook::listen('user_login_success');
-        Result::success('登录成功') ->send();
+        return EasyResult::success('登录成功') ->put('token', $token);
     }
 
     public function logout()
     {
-
+        echo 1;
     }
 }

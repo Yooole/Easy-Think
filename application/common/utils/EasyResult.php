@@ -6,13 +6,13 @@
  * Time: 16:16
  */
 
-namespace app\common;
+namespace app\common\utils;
 
 
 use think\exception\HttpResponseException;
 use think\facade\Response;
 
-class Result
+class EasyResult
 {
     public $success;
     public $code;
@@ -51,7 +51,7 @@ class Result
 
     /**
      * 响应数据
-     * @param array $data
+     * @param array|string $data
      * @param int $code
      * @return static
      */

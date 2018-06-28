@@ -9,13 +9,13 @@
 namespace app\common;
 
 
-use app\common\hook\userLoginEvent;
+use app\common\hook\userLogin;
 use think\facade\Hook;
 
 class HookInit
 {
     public function run()
     {
-        Hook::add('user_login_success', userLoginEvent::class);
+        Hook::add('user_login_success', userLogin::class);
     }
 }

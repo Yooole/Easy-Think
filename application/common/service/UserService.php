@@ -31,16 +31,18 @@ class UserService
             EasyResult::error($this ->userNameLoginErrorMessage) ->send();
         }
 
-        $loginToken = EasyAuth::addAuth();
+        //更新用户登录信息
+        $data['login_time'] = time();
+        $data['login_ip'] = request() ->ip(true);
+        $data['login_agent'] = request() ->header('user-agent');
+        $data['login_token'] = EasyAuth::authToken($data);
+        $data['login_count'] = ['exp' =>'login_count + 1'];
+        $userMember = UserMember::update($data, ['uid' =>$userMember['uid']], true);
 
-
-
-        $update['login_ip'] = request() ->ip(true);
-        $update['login_time'] = time();
-        $update['login_token'] = $loginToken;
-        UserMember::update($update, ['uid' =>$userMember['uid']]);
-        $userMember ->visible(['uid', 'username', 'create_time', 'update_time', 'status']);
-        return $loginToken;
+        //保存用户登录状态
+        $userMember ->hidden(['password', 'create_time', 'update_time']);
+        EasyAuth::addAuth($userMember ->toArray());
+        return $data['login_token'];
     }
 
     public function usernameRegister($username, $password)

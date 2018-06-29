@@ -31,10 +31,10 @@ class UserController extends Admin
      * 用户登录接口
      * @param string $username 登录账号
      * @param string $password 登录密码
-     * @param string $captcha
+     * @param string $code
      * @return EasyResult
      */
-    public function login($username, $password, $captcha)
+    public function login($username, $password, $code)
     {
         //字段验证
         $rules = ['username' =>'require', 'password' =>'require|min:6'];
@@ -42,10 +42,10 @@ class UserController extends Admin
         EasyValidate::make($this ->request ->param(), $rules, $message)->send();
 
         //验证码验证
-        if(!captcha_check($captcha)) {
-//            return EasyResult::error('验证码错误');
+        if(!captcha_check($code)) {
+            return EasyResult::error('验证码错误');
         }
-
+        
         //执行登录操作
         $token = $this ->userService ->usernameLogin($username, $password);
         Hook::listen('user_login_success');

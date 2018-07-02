@@ -43,7 +43,7 @@ class UserController extends Admin
 
         //验证码验证
         if(!captcha_check($code)) {
-            return EasyResult::error('验证码错误');
+//            return EasyResult::error('验证码错误');
         }
         
         //执行登录操作

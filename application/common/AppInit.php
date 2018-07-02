@@ -14,8 +14,8 @@ class AppInit
     public static function run()
     {
         error_reporting(E_ERROR | E_PARSE );
-        header("Access-Control-Allow-Origin:*");
-        header("Access-Control-Allow-Headers:content-type");
-        header("Access-Control-Request-Method:GET,POST");
+        header('Access-Control-Allow-Origin: *');
+        header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
+        header('Access-Control-Allow-Methods: GET ,POST');
     }
 }

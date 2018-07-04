@@ -36,7 +36,7 @@ class UserController extends Admin
      * @param string $code
      * @return EasyResult
      */
-    public function login($username, $password, $code)
+    public function loginByUserName($username, $password, $code)
     {
         //字段验证
         $rules = ['username' =>'require', 'password' =>'require|min:6'];
@@ -50,6 +50,12 @@ class UserController extends Admin
         $member = $this ->authService ->usernameLogin($username, $password);
         Hook::listen('user_login_success');
         return EasyResult::success('登录成功') ->put('token', $member['login_token']);
+    }
+
+    public function loginByToken($token)
+    {
+        EasyValidate::make($this ->request ->param()) ->rule('token', 'require') ->send();
+        return $this ->authService ->tokenLogin($token);
     }
 
     /**

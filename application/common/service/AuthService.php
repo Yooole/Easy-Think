@@ -44,6 +44,17 @@ class AuthService
         return $member ->hidden(['password', 'create_time', 'update_time', 'status']) ->toArray();
     }
 
+    /**
+     * 使用Token登录
+     * @param $token
+     * @return array
+     */
+    public function tokenLogin($token)
+    {
+        $member = $this ->memberService ->getMemberByToken($token);
+        return $member;
+    }
+
     public function logout()
     {
         EasyAuth::removeAuth();

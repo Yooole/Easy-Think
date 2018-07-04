@@ -9,6 +9,7 @@
 namespace app\common\model;
 
 
+use app\common\service\MemberService;
 use think\Model;
 
 /**
@@ -20,4 +21,12 @@ class UserMember extends Model
     protected $pk = 'uid';
     protected $table = 'easy_user_member';
     protected $autoWriteTimestamp = true;
+
+    public static function init()
+    {
+        self::event('after_update', function ($member) {
+            $service = new MemberService();
+            $service ->clearMemberCache($member ->uid);
+        });
+    }
 }

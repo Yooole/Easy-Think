@@ -13,6 +13,7 @@ class CacheKeys
 {
     public static $MemberInfoByUserId = 'member_info_by_user_id@';
     public static $MemberInfoByUserName = 'member_info_by_user_name@';
+    public static $MemberInfoByToken = 'member_info_by_token@';
 
 
 }

@@ -11,7 +11,7 @@ namespace app\common\service;
 
 use app\common\CacheKeys;
 use app\common\model\UserMember;
-use think\facade\Cache;
+use think\Cache;
 
 
 class MemberService
@@ -40,6 +40,19 @@ class MemberService
         $cacheKey = CacheKeys::$MemberInfoByUserName . $username;
         return Cache::remember($cacheKey, function() use($username){
             return UserMember::where('username', $username) ->find();
+        });
+    }
+
+    /**
+     * 根据Token获取用户信息
+     * @param $token
+     * @return mixed
+     */
+    public function getMemberByToken($token)
+    {
+        $cacheKey = CacheKeys::$MemberInfoByToken . $token;
+        return Cache::remember($cacheKey, function() use($token){
+            return UserMember::where('login_token', $token) ->find();
         });
     }
 

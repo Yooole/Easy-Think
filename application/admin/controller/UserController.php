@@ -10,21 +10,23 @@ namespace app\admin\controller;
 
 
 use app\admin\Admin;
-use app\common\service\UserService;
+use app\common\service\AuthService;
+use app\common\utils\EasyAuth;
 use app\common\utils\EasyResult;
 use app\common\utils\EasyValidate;
 use think\facade\Hook;
+use think\Request;
 
 class UserController extends Admin
 {
 
-    /** @var $userService UserService */
-    private $userService;
+    /** @var $authService AuthService*/
+    private $authService;
 
     public function initialize()
     {
         parent::initialize();
-        $this ->userService = app(UserService::class);
+        $this ->authService = app(AuthService::class);
     }
 
     /**
@@ -42,18 +44,21 @@ class UserController extends Admin
         EasyValidate::make($this ->request ->param(), $rules, $message)->send();
 
         //验证码验证
-        if(!captcha_check($code)) {
-//            return EasyResult::error('验证码错误');
-        }
-        
+        if(!captcha_check($code)) return EasyResult::error('验证码错误');
+
         //执行登录操作
-        $token = $this ->userService ->usernameLogin($username, $password);
+        $member = $this ->authService ->usernameLogin($username, $password);
         Hook::listen('user_login_success');
-        return EasyResult::success('登录成功') ->put('token', $token);
+        return EasyResult::success('登录成功') ->put('token', $member['login_token']);
     }
 
+    /**
+     * 安全退出
+     * @return EasyResult
+     */
     public function logout()
     {
-        echo 1;
+        $this ->authService ->logout();
+        return EasyResult::success('已安全退出');
     }
 }

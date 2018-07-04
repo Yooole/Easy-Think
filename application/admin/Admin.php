@@ -9,6 +9,8 @@
 namespace app\admin;
 
 
+use app\common\utils\EasyAuth;
+use app\common\utils\EasyResult;
 use think\Controller;
 
 class Admin extends Controller
@@ -18,9 +20,9 @@ class Admin extends Controller
     {
         $whiteList = ['login'];
         if(!in_array($this ->request ->action(), $whiteList)) {
-            //验证用户登录权限
-
-
+            if(!EasyAuth::checkAuth()) {
+                EasyResult::error('请求超时，请重新登录', 4009) ->send();
+            }
         }
     }
 

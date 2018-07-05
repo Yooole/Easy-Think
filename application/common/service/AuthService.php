@@ -38,25 +38,29 @@ class AuthService
         $member ->login_time = time();
         $member ->login_count = ['inc', 1];
         $member ->login_ip = request() ->ip(true);
-        $member ->login_token = EasyAuth::authToken($member ->toArray());
         $member ->isUpdate(true) ->save();
-        EasyAuth::addAuth($member ->toArray());
-        return $member ->hidden(['password', 'create_time', 'update_time', 'status']) ->toArray();
+        $member ->user_token = EasyAuth::authLogin($member ->toArray());
+        return $member ->hidden(['password', 'login_count', 'create_time', 'update_time', 'status']) ->toArray();
     }
 
     /**
-     * 使用Token登录
-     * @param $token
-     * @return array
+     * 自动登录
+     * @return bool
      */
-    public function tokenLogin($token)
+    public function automaticLogin()
     {
-        $member = $this ->memberService ->getMemberByToken($token);
-        return $member;
+        $data = EasyAuth::getAuthInfo();
+        if(!$data) return false;
+        $token = request() ->header('user_token');
+        if($data['user_token'] != $token) return false;
+        return EasyAuth::authLogin($data);
     }
 
+    /**
+     * 退出登录
+     */
     public function logout()
     {
-        EasyAuth::removeAuth();
+        EasyAuth::authLogout();
     }
 }

@@ -14,52 +14,62 @@ class EasyAuth
     private static $authSessionKey = 'easy_auth_login_session';
 
     /**
-     * 保存用户登录信息
-     * @param array $data
-     * @param int $expire
-     * @return int
+     * 验证用户是否登录
+     * @param bool $verify_agent 是否需要验证用户的请求头
+     * @return bool
      */
-    public static function addAuth(array $data, $expire = 7 * 3600)
-    {
-        $data['login_expire'] = time() + $expire;
-        $data['login_agent'] = request() ->header('user-agent');
-        return session(self::$authSessionKey, $data);
-    }
-
-    /**
-     * 校验用户登录信息
-     * @param  boolean $agent_verify 是否校验TOKEN
-     * @return boolean
-     */
-    public static function checkAuth($agent_verify = true)
+    public static function isLogin($verify_agent = true)
     {
         $data = session(self::$authSessionKey);
-        if(!$data || time() >= $data['login_expire']) return false;
-        if($agent_verify && $data['login_agent'] != request() ->header('user-agent')) return false;
+        if(!$data || time() >= $data['expire_time']) return false;
+        if($verify_agent && request() ->header('user-agent') != $data['user_agent']) return false;
         return true;
     }
 
     /**
-     * 删除用户登录信息
-     * @return mixed
+     * 获取当前登录用户信息
+     * @return array
      */
-    public static function removeAuth()
+    public static function getAuthInfo()
     {
-        return session(self::$authSessionKey, null);
+        $data = session(self::$authSessionKey);
+        return array_diff_key($data, ['expire_time', 'user_agent']);
     }
 
     /**
-     * 生成用户TOKEN
-     * @param array $data 参与加密的数据
-     * @param string $key 加密KEY
+     * 用户登录
+     * @param array $data 保存的信息
+     * @param int $expire 有效期 默认一个小时
      * @return string
      */
-    public static function authToken(array $data, $key = '')
+    public static function authLogin(array $data, $expire = 24 * 3600)
     {
-        $signInfo['uid'] = $data['uid'] ?? '';
-        $signInfo['login_ip'] = $data['login_ip'] ?? '';
-        $signInfo['login_time'] = $data['login_time'] ?? '';
-        return sha1(http_build_query($signInfo) . $key);
+        $data['expire_time'] = time() + $expire;
+        $data['user_agent'] = request() ->header('user-agent');
+        $data['user_token'] = self::sign($data);
+        session(self::$authSessionKey, $data);
+        return $data['user_token'];
+    }
+
+    /**
+     * 用户退出
+     * @return mixed
+     */
+    public static function authLogout()
+    {
+        return session(self::$authSessionKey, NULL);
+    }
+
+    /**
+     * 用户签名
+     * @param array $data 需要生成签名的数据
+     * @param string $key 加密字符串
+     * @return string
+     */
+    public static function sign(array $data, $key = '')
+    {
+        ksort($data);
+        return sha1(implode('|', $data) . $key);
     }
 
     /**

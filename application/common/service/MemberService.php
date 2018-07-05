@@ -11,7 +11,7 @@ namespace app\common\service;
 
 use app\common\CacheKeys;
 use app\common\model\UserMember;
-use think\Cache;
+use think\facade\Cache;
 
 
 class MemberService

@@ -9,13 +9,15 @@
 namespace app\common;
 
 
+
 class AppInit
 {
     public static function run()
     {
         error_reporting(E_ERROR | E_PARSE );
-        header('Access-Control-Allow-Origin: *');
-        header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept");
-        header('Access-Control-Allow-Methods: GET ,POST');
+        header('Access-Control-Allow-Origin: http://www.7imm.com:8080');
+        header('Access-Control-Allow-Credentials', true);
+        header("Access-Control-Allow-Headers: Origin, X-Requested-With, Content-Type, Accept, Access-Token");
+        header('Access-Control-Allow-Methods: PUT, POST, GET, DELETE, OPTIONS');
     }
 }
